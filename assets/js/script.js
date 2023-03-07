@@ -1,0 +1,560 @@
+var arrayProductos = [];
+var arrayCodigos = [];
+$(document).ready(function () {
+    var url = window.location.href;
+    var splice = url.split("/");
+    var url = splice[0] + "//" + splice[2] + "/" + splice[3] + "/" + splice[4];
+    var ultimo = splice[splice.length - 1];
+        if(ultimo == "registrar-venta"){
+        var y = JSON.parse(productosLista);
+        arrayProductos = y;
+        var x = JSON.parse(codigosLista);
+        arrayCodigos = x;
+        document.getElementById('bolsas').value = 0;
+    }
+});
+function validarComprobante() {
+    var comprobante = document.getElementById('tipoComprobante');
+    var comprobanteValue = comprobante.value;
+    var ruc = document.getElementsByClassName('ruc');
+    if (comprobanteValue == "Boleta") {
+        ruc[0].style.display = "none";
+        ruc[1].style.display = "none";
+        ruc[2].style.display = "none";
+        document.getElementById('ruc').value = "";
+        document.getElementById('razonSocial').value = "";
+        document.getElementById('direccionFiscal').value = "";
+    }else {
+        ruc[0].style.display = "flex";
+        ruc[1].style.display = "flex";
+        ruc[2].style.display = "flex";
+    }
+}
+function validarMedioPago(){
+    var medioPago = document.getElementById('medioPago').value;
+    var efectivo = document.getElementsByClassName('efectivo');
+    if(medioPago == "Efectivo"){
+        efectivo[0].style.display = "flex";
+        efectivo[1].style.display = "flex";
+    }else{
+        efectivo[0].style.display = "none";
+        efectivo[1].style.display = "none";
+        document.getElementById('pagocon').value = "S/ 0.00";
+        document.getElementById('vuelto').value = "S/ 0.00";
+    }
+}
+function soloNumeros(e){
+    var key = window.Event ? e.which : e.keyCode
+    return (key >= 48 && key <= 57)
+}
+function soloLetras(e){
+    var key = window.Event ? e.which : e.keyCode
+    return (key >= 65 && key <= 90) || (key >= 97 && key <= 122)
+}
+var productos = [];
+function agregarProducto(){
+    if(productos.length > 0){
+        if(!validarCamposVacios(productos)){
+            return;
+        }
+    }
+    productos.push(
+        {
+            id: productos.length+1,
+            codigo: "",
+            nombre: "",
+            precio: 0,
+            cantidad: 1,
+            total: 0
+        }
+    )
+    for(i=0; i<productos.length; i++){
+        if(productos[i].id == productos.length){
+            document.getElementById('productos').insertRow(-1).innerHTML = '<td>'+productos[i].id+'</td><td><div style="max-width:350px !important; margin:auto" class="input-group"><span class="input-group-text">Código</span><input value="'+productos[i].codigo+'" id="codigoProducto'+productos[i].id+'" style="max-width:200px !important" type="text" class="form-control" placeholder="Escriba aquí"><button onclick="buscarProducto('+productos[i].id+')" style="align-items:center" class="btn btn btn-success" type="button" id="buscar'+productos[i].id+'">Buscar</button></div></td><td><span id="nombreProducto'+productos[i].id+'"></span></td><td><span id="precioProducto'+productos[i].id+'"></span></td><td><div class="input-group"><input id="numero'+productos[i].id+'" type="text" class="form-control" value="1"><button onclick="aumentarCantidad('+productos[i].id+')" style="align-items:center" class="btn btn btn-success" type="button">+</button><button onclick="disminuirCantidad('+productos[i].id+')" style="align-items:center" class="btn btn btn-danger" type="button">-</button></div></td><td><span id="totalProducto'+productos[i].id+'"></span></td><td><i onclick="eliminarProductov(this, '+productos[i].id+')" class="fa fa-close"></i></td>';
+            validarCampos();
+        }
+    }
+}
+function buscarProducto(i) {
+    if(document.getElementById('codigoProducto'+i).value == ""){
+        alertify.error("Ingrese un código");
+        return;
+    }else{
+        productos.forEach((producto) => {
+            if(producto.id == i){
+                for (const producto of arrayProductos){
+                    if (producto.codigo == document.getElementById('codigoProducto'+i).value) {
+                        var codigoX = producto.codigo;
+                        var nombreX = producto.nombre;
+                        var precioX = producto.precio;
+                        document.getElementById('nombreProducto'+i).innerHTML = nombreX;
+                        document.getElementById('precioProducto'+i).innerHTML = "S/"+(parseFloat(precioX)).toFixed(2);
+                        document.getElementById('totalProducto'+i).innerHTML = "S/"+(parseFloat(precioX)).toFixed(2);
+                        document.getElementById('buscar'+i).disabled = true;
+                    }
+                }
+                producto.codigo = codigoX;
+                producto.nombre = nombreX;
+                producto.precio = precioX;
+                producto.total = precioX;
+                producto.cantidad = 1;
+            }
+            calcularSubTotal();
+        })
+    }
+}
+function aumentarCantidad(i) {
+    productos.forEach((producto) => {
+        if(producto.id == i){
+            var cantidad = document.getElementById('numero'+i).value;
+            cantidad++;
+            document.getElementById('numero'+i).value = cantidad;
+            document.getElementById('totalProducto'+i).innerHTML = "S/"+(parseFloat(producto.precio) * cantidad).toFixed(2);
+            producto.total = (producto.precio * cantidad).toFixed(2);
+            producto.cantidad = cantidad;
+        }
+    })
+    calcularSubTotal();
+}
+function disminuirCantidad(i) {
+    productos.forEach((producto) => {
+        if(producto.id == i){
+            var cantidad = document.getElementById('numero'+i).value;
+            if(cantidad > 1){
+                cantidad--;
+                document.getElementById('numero'+i).value = cantidad;
+                document.getElementById('totalProducto'+i).innerHTML = "S/"+(parseFloat(producto.precio) * cantidad).toFixed(2);
+                producto.total = (producto.precio * cantidad).toFixed(2);
+                producto.cantidad = cantidad;
+            }
+        }
+    })
+    calcularSubTotal();
+}
+function validarCamposVacios(productos){
+    for (const producto of productos) {
+        if(producto.nombre == ""){
+            return false;
+        }
+    }
+    return true;
+}
+function upto(el, tagName){
+    tagName = tagName.toLowerCase();
+    while (el && el.parentNode){
+        el = el.parentNode;
+        if (el.tagName && el.tagName.toLowerCase() == tagName){
+            return el;
+        }
+    }
+    return null;
+}
+function eliminarProductov(el, i){
+    productos.forEach((producto) => {
+        if(producto.id == i){
+            var index = productos.indexOf(producto);
+            productos.splice(index, 1);
+            var tr = upto(el, 'tr');
+            if (tr){
+                var tbody = tr.parentNode;
+                tbody.removeChild(tr);
+            }
+        }
+    })
+    calcularSubTotal();
+    validarCampos();
+}
+function calcularSubTotal(){
+    var subtotal = 0;
+    var igv = 0;
+    var total = 0;
+    productos.forEach((producto) => {
+        subtotal += parseFloat(producto.total);
+        igv = subtotal * 0.18;
+        total = subtotal + igv;
+    })
+    document.getElementById('subtotal').value = "S/"+subtotal.toFixed(2);
+    document.getElementById('igv').value = "S/"+igv.toFixed(2);
+    document.getElementById('total').value = "S/"+total.toFixed(2);
+}
+function calcularVuelto(){
+    var vuelto = 0;
+    var pagocon = document.getElementById('pagocon').value;
+    var total = document.getElementById('total').value;
+    pagocon = pagocon.replace("S/", "");
+    total = total.replace("S/", "");
+    vuelto = parseFloat(pagocon) - parseFloat(total);
+    document.getElementById('vuelto').value = "S/"+vuelto.toFixed(2);
+}
+var contador = 0;
+function validarCodigoDescuento(){
+    var codigo = document.getElementById('codigo').value;
+    var descuento = 0;
+    var total = 0;
+    arrayCodigos.forEach((descuento) => {
+        if(descuento.codigo == codigo){
+            if(contador == 0){
+                contador++;
+                document.getElementById('codigo').disabled = true;
+                descuento = descuento.descuento;
+                total = document.getElementById('total').value;
+                total = total.replace("S/", "");
+                total = parseFloat(total) - (parseFloat(total) * parseFloat(descuento) / 100);
+                document.getElementById('total').value = "S/"+total.toFixed(2);
+                alertify.success("Código de descuento aplicado");
+            }else{
+                alertify.error("Ya se aplicó un código de descuento");
+            }
+        }
+    })
+}
+function validarCampos() {
+    var boton = document.getElementById('boton');
+    var dni = document.getElementById('dni').value;
+    var nombres = document.getElementById('nombres').value;
+    var apellidos = document.getElementById('apellidos').value;
+    var fechaEmision = document.getElementById('fechaEmision').value;
+    var horaEmision = document.getElementById('horaEmision').value;
+    var vendedor = document.getElementById('vendedor').value;
+    var mozo = document.getElementById('mozo').value;
+    var sede = document.getElementById('sede').value;
+    var tipoComprobante = document.getElementById('tipoComprobante').value;
+    var medioPago = document.getElementById('medioPago').value;
+    if(productos.length > 0 && dni != "" && nombres != "" && apellidos != "" && fechaEmision != "" && horaEmision != "" && vendedor != "" && mozo != "" && sede != "" && tipoComprobante != "" && medioPago != ""){
+        boton.disabled = false;
+    }else{
+        boton.disabled = true;
+    }
+}
+function registrarVenta(){
+    var dni = document.getElementById('dni').value;
+    var nombres = document.getElementById('nombres').value;
+    var apellidos = document.getElementById('apellidos').value;
+    var correo = document.getElementById('correo').value;
+    var celular = document.getElementById('celular').value;
+    var nComprobante = document.getElementById('nComprobante').value;
+    var fechaEmision = document.getElementById('fechaEmision').value;
+    var horaEmision = document.getElementById('horaEmision').value;
+    var vendedor = document.getElementById('vendedor').value;
+    var mozo = document.getElementById('mozo').value;
+    var sede = document.getElementById('sede').value;
+    var bolsas = document.getElementById('bolsas').value;
+    var tipoComprobante = document.getElementById('tipoComprobante').value;
+    var ruc = document.getElementById('ruc').value;
+    var razonSocial = document.getElementById('razonSocial').value;
+    var direccionFiscal = document.getElementById('direccionFiscal').value;
+    var medioPago = document.getElementById('medioPago').value;
+    var pagocon = document.getElementById('pagocon').value;
+    var vuelto = document.getElementById('vuelto').value;
+    var subtotal = document.getElementById('subtotal').value;
+    var codigoDescuento = document.getElementById('codigo').value;
+    var igv = document.getElementById('igv').value;
+    var total = document.getElementById('total').value;
+    var datos = {
+        dni: dni,
+        nombres: nombres,
+        apellidos: apellidos,
+        correo: correo,
+        celular: celular,
+        nComprobante: nComprobante,
+        fechaEmision: fechaEmision,
+        horaEmision: horaEmision,
+        vendedor: vendedor,
+        mozo: mozo,
+        sede: sede,
+        bolsas: bolsas,
+        tipoComprobante: tipoComprobante,
+        ruc: ruc,
+        razonSocial: razonSocial,
+        direccionFiscal: direccionFiscal,
+        medioPago: medioPago,
+        pagocon: pagocon,
+        vuelto: vuelto,
+        subtotal: subtotal.replace("S/", ""),
+        codigoDescuento: codigoDescuento,
+        igv: igv.replace("S/", ""),
+        total: total.replace("S/", ""),
+        productos: productos
+    }
+    $.ajax({
+        type: "POST",
+        url: "registrarVenta.php",
+        dataType: 'json',
+        data: {
+            datos: datos
+        }, error: function () {
+            vaciarCampos();
+            document.getElementById('nComprobante').value = parseInt(nComprobante)+1;
+            alertify.success("Venta registrada")
+        }
+    })
+}
+function vaciarCampos(){
+    document.getElementById('dni').value = "";
+    document.getElementById('nombres').value = "";
+    document.getElementById('apellidos').value = "";
+    document.getElementById('correo').value = "";
+    document.getElementById('celular').value = "";
+    document.getElementById('nComprobante').value = "";
+    document.getElementById('fechaEmision').value = "";
+    document.getElementById('horaEmision').value = "";
+    document.getElementById('vendedor').value = "";
+    document.getElementById('mozo').value = "";
+    document.getElementById('sede').value = "";
+    document.getElementById('bolsas').value = 0;
+    document.getElementById('tipoComprobante').value = "";
+    document.getElementById('ruc').value = "";
+    document.getElementById('razonSocial').value = "";
+    document.getElementById('direccionFiscal').value = "";
+    document.getElementById('medioPago').value = "";
+    document.getElementById('pagocon').value = "S/0.00";
+    document.getElementById('vuelto').value = "S/0.00";
+    document.getElementById('subtotal').value = "S/0.00";
+    document.getElementById('codigo').value = "";
+    document.getElementById('igv').value = "S/0.00";
+    document.getElementById('total').value = "S/0.00";
+    document.getElementById('codigo').disabled = false;
+    contador = 0;
+    document.getElementById('productos').innerHTML = "";
+    productos = [];
+    document.getElementsByClassName('ruc')[0].style.display = "none";
+    document.getElementsByClassName('ruc')[1].style.display = "none";
+    document.getElementsByClassName('ruc')[2].style.display = "none";
+    document.getElementsByClassName('efectivo')[0].style.display = "none";
+    document.getElementsByClassName('efectivo')[1].style.display = "none";
+    document.getElementById('boton').disabled = true;
+}
+function verDetalle(i){
+    $.ajax({
+        type: "POST",
+        url: "detalle-venta.php",
+        dataType: 'json',
+        data: {
+            id: i
+        }
+    }).done(
+        function (data) {
+            document.getElementById('dni').value = data.dni;
+            document.getElementById('nombres').value = data.nombres;
+            document.getElementById('apellidos').value = data.apellidos;
+            document.getElementById('correo').value = data.correo;
+            document.getElementById('celular').value = data.celular;
+            document.getElementById('nComprobante').value = data.nComprobante;
+            document.getElementById('fechaEmision').value = data.fechaEmision.split("-").reverse().join("-");
+            document.getElementById('horaEmision').value = data.horaEmision;
+            document.getElementById('vendedor').value = data.vendedor;
+            document.getElementById('mozo').value = data.mozo;
+            document.getElementById('sede').value = data.sede;
+            document.getElementById('bolsas').value = data.bolsas;
+            document.getElementById('tipoComprobante').value = data.tipoComprobante;
+            document.getElementById('ruc').value = data.ruc;
+            document.getElementById('razonSocial').value = data.razonSocial;
+            document.getElementById('direccionFiscal').value = data.direccionFiscal;
+            if(document.getElementById('ruc').value != ""){
+                document.getElementsByClassName('ruc')[0].style.display = "flex";
+                document.getElementsByClassName('ruc')[1].style.display = "flex";
+                document.getElementsByClassName('ruc')[2].style.display = "flex";
+            }else{
+                document.getElementsByClassName('ruc')[0].style.display = "none";
+                document.getElementsByClassName('ruc')[1].style.display = "none";
+                document.getElementsByClassName('ruc')[2].style.display = "none";
+            }
+            document.getElementById('medioPago').value = data.medioPago;
+            if(document.getElementById('medioPago').value == "Efectivo"){
+                document.getElementsByClassName('efectivo')[0].style.display = "flex";
+                document.getElementsByClassName('efectivo')[1].style.display = "flex";
+            }else{
+                document.getElementsByClassName('efectivo')[0].style.display = "none";
+                document.getElementsByClassName('efectivo')[1].style.display = "none";
+            }
+            
+            document.getElementById('pagocon').value = data.pagocon;
+            document.getElementById('vuelto').value = data.vuelto;
+            document.getElementById('subtotal').value = "S/"+data.subtotal;
+            document.getElementById('codigoDescuento').value = data.codigo;
+            document.getElementById('igv').value = "S/"+data.igv;
+            document.getElementById('total').value = "S/"+data.total;
+            var productos = data.productos;
+            for(i=0; i<productos.length; i++){
+                document.getElementById('productosTabla').insertRow(-1).innerHTML = '<td>'+productos[i].idProducto+'</td><td>'+productos[i].codigo+'</td><td><span>'+productos[i].nombre+'</span></td><td><span>S/'+productos[i].precio+'</span></td><td>'+productos[i].cantidad+'</td><td><span>S/'+productos[i].total+'</span></td>';
+            }
+        }
+    ); 
+}
+function cerrarDetalle(){
+    $('#dni').empty();
+    $('#nombres').empty();
+    $('#apellidos').empty();
+    $('#correo').empty();
+    $('#celular').empty();
+    $('#nComprobante').empty();
+    $('#fechaEmision').empty();
+    $('#horaEmision').empty();
+    $('#vendedor').empty();
+    $('#sede').empty();
+    $('#tipoComprobante').empty();
+    $('#ruc').empty();
+    $('#razonSocial').empty();
+    $('#direccionFiscal').empty();
+    $('#medioPago').empty();
+    $('#subtotal').empty();
+    $('#codigoDescuento').empty();
+    $('#igv').empty();
+    $('#total').empty();
+    $('#productosTabla').empty();
+}
+function obtenerReporte(){
+    var fechaDesde = document.getElementById('fechaDesde').value;
+    var fechaHasta = document.getElementById('fechaHasta').value;
+    if(fechaDesde == "" || fechaHasta == ""){
+        alertify.error("Ingrese las fechas");
+    }else{
+        $.ajax({
+            type: "POST",
+            url: "exportarExcel.php",
+            dataType: 'json',
+            data: {
+                fechaDesde: fechaDesde,
+                fechaHasta: fechaHasta
+            }
+        }).done(
+            function (data) {
+                document.getElementById('resultados').innerHTML = "";
+                if(data.ventas.length > 0){
+                    document.getElementById('btn-excel').style.display = "flex";
+                    document.getElementById('box-table').style.display = "flex";
+                    document.getElementById('mensaje').style.display = "none";
+                    for(i=0; i<data.ventas.length; i++){
+                        var productosCantidad = [];
+                        for(j=0; j<data.productos.length; j++){
+                            if(data.ventas[i].id == data.productos[j].idVenta){
+                                productosCantidad.push(data.productos[j]);
+                            }
+                        }
+                        document.getElementById('resultados').insertRow(-1).innerHTML = '<td>'+data.ventas[i].nComprobante+'</td><td>'+data.ventas[i].fechaEmision+" "+data.ventas[i].horaEmision+'</td><td>'+data.ventas[i].tipoComprobante+'</td><td>'+data.ventas[i].sede+'</td><td>'+data.ventas[i].nombres+" "+data.ventas[i].apellidos+'</td><td>'+data.ventas[i].medioPago+'</td><td>'+data.ventas[i].vendedor+'</td><td>'+data.ventas[i].mozo+'</td><td>'+data.ventas[i].bolsas+'</td><td>'+data.ventas[i].codigo+'</td><td>'+productosCantidad.length+'</td><td>'+data.ventas[i].pagocon+'</td><td>'+data.ventas[i].vuelto+'</td><td>S/'+data.ventas[i].subtotal+'</td><td>S/'+data.ventas[i].igv+'</td><td>S/'+data.ventas[i].total+'</td>';
+                    }
+                }else{
+                    document.getElementById('btn-excel').style.display = "none";
+                    document.getElementById('box-table').style.display = "none";
+                    document.getElementById('mensaje').style.display = "flex";
+                }
+            }
+        )
+        }
+}
+function exportarExcel(){
+    var downloadLink;
+    var dataType = 'application/vnd.ms-excel';
+    var tableSelect = document.getElementById('tabla');
+    var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
+    var filename = 'Reporte' + new Date().toLocaleDateString() + '.xls';
+    downloadLink = document.createElement("a");
+    document.body.appendChild(downloadLink);
+    if (navigator.msSaveOrOpenBlob) {
+        var blob = new Blob(['\ufeff', tableHTML], {
+            type: dataType,
+            content: 'charset=utf-8'
+        });
+        navigator.msSaveOrOpenBlob(blob, filename);
+    }else{
+        downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
+        downloadLink.download = filename;
+        downloadLink.click();
+    }
+}
+function aumentarBolsa(){
+    var cantidad = document.getElementById('bolsas').value;
+    cantidad++;
+    var total = document.getElementById('total').value;
+    total = total.replace("S/", "");
+    total = parseFloat(total);
+    total = total + 0.20;
+    document.getElementById('total').value = "S/"+total.toFixed(2);
+    document.getElementById('bolsas').value = cantidad;
+}
+function disminuirBolsa(){
+    var cantidad = document.getElementById('bolsas').value;
+    if(cantidad > 1){
+        cantidad--;
+        var total = document.getElementById('total').value;
+        total = total.replace("S/", "");
+        total = parseFloat(total);
+        total = total - 0.20;
+        document.getElementById('total').value = "S/"+total.toFixed(2);
+        document.getElementById('bolsas').value = cantidad;
+    }
+}
+var nuevosProductos = [];
+function agregarNuevoProducto(){
+    document.getElementById('guardarProductos').disabled = false;
+    if(nuevosProductos.length > 0){
+        for(i=0; i<nuevosProductos.length; i++){
+            if(nuevosProductos[i].codigo == "" || nuevosProductos[i].nombre == "" || nuevosProductos[i].precio == 0){
+                alertify.error("Complete los campos y valide para agregar un nuevo producto");
+                return;
+            }
+        }
+    }
+    nuevosProductos.push({
+        id: nuevosProductos.length+1,
+        codigo: "",
+        nombre: "",
+        precio: 0,
+    })
+    for(i=0; i<nuevosProductos.length; i++){
+        if(nuevosProductos[i].id == nuevosProductos.length){
+            document.getElementById('productos').insertRow(-1).innerHTML = '<tr><td>'+nuevosProductos[i].id+'</td><td><div style="max-width:250px !important; margin:auto" class="input-group"><input value="'+nuevosProductos[i].codigo+'" id="codigoProducto'+nuevosProductos[i].id+'" type="text" class="form-control" placeholder="Escriba aquí"></div></td><td><input value="'+nuevosProductos[i].nombre+'" id="nombreProducto'+nuevosProductos[i].id+'" type="text" class="form-control" placeholder="Escriba aquí"></td><td><div class="input-group"><span class="input-group-text">S/</span><input value="'+nuevosProductos[i].precio+'" id="precioProducto'+nuevosProductos[i].id+'" type="text" class="form-control" placeholder="Escriba aquí"></div></td><td><i onclick="validarNuevoProducto('+nuevosProductos[i].id+')" class="fa fa-check"></i></td><td><i onclick="eliminarNuevoProducto(this, '+nuevosProductos[i].id+')" class="fa fa-close"></i></td></tr>'
+        }
+    }
+}
+function validarNuevoProducto(i){
+    nuevosProductos.forEach((producto) => {
+        if(producto.id == i){
+            if(document.getElementById('codigoProducto'+i).value == "" || document.getElementById('nombreProducto'+i).value == "" || document.getElementById('precioProducto'+i).value == 0){
+                alertify.error("Complete todos los campos");
+                return;
+            }else{
+                producto.codigo = document.getElementById('codigoProducto'+i).value;
+                producto.nombre = document.getElementById('nombreProducto'+i).value;
+                producto.precio = document.getElementById('precioProducto'+i).value;
+                document.getElementById('codigoProducto'+i).disabled = true;
+                document.getElementById('nombreProducto'+i).disabled = true;
+                document.getElementById('precioProducto'+i).disabled = true;
+            }
+        }
+    })
+}
+function eliminarNuevoProducto(el, i){
+    nuevosProductos.forEach((producto) => {
+        if(producto.id == i){
+            var index = nuevosProductos.indexOf(producto);
+            nuevosProductos.splice(index, 1);
+            var tr = upto(el, 'tr');
+            if(tr){
+                var tbody = tr.parentNode;
+                tbody.removeChild(tr);
+            }
+        }
+    })
+    if(nuevosProductos.length > 0){
+        document.getElementById('guardarProductos').disabled = false;
+    }else{
+        document.getElementById('guardarProductos').disabled = true;
+    }
+}
+function registrarNuevosProductos(){
+    $.ajax({
+        type: "POST",
+        url: "registrarNuevosProductos.php",
+        dataType: 'json',
+        data: {
+            nuevosProductos: nuevosProductos
+        }, error: function (){
+            nuevosProductos = [];
+            document.getElementById('productos').innerHTML = "";
+            document.getElementById('guardarProductos').disabled = true;
+            alertify.success("Productos registrados")
+        }
+    })
+}
+var nuevosCodigos = [];
