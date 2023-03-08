@@ -38,11 +38,11 @@
             </div>
             <div class="input-group">
                 <span class="input-group-text">Nombres</span>
-                <input id="nombres" onkeypress="return soloLetras(event)" type="text" class="form-control" placeholder="Escriba aquí">
+                <input id="nombres" type="text" class="form-control" placeholder="Escriba aquí">
             </div>
             <div class="input-group">
                 <span class="input-group-text">Apellidos</span>
-                <input id="apellidos" onkeypress="return soloLetras(event)" type="text" class="form-control" placeholder="Escriba aquí">
+                <input id="apellidos" type="text" class="form-control" placeholder="Escriba aquí">
             </div>
             <div class="input-group">
                 <span class="input-group-text">Correo</span>
