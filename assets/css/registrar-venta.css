@@ -81,7 +81,33 @@ tr {
     color: #000;
     cursor: pointer;
 }
-
+.buscador {
+    background-color: #6E2BF3 !important;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    position: fixed !important;
+    bottom: 20px;
+    right: 20px;
+    transition: ease-in-out 0.3s;
+}
+.buscador:hover{
+    background-color: #551ec3 !important;
+    transition: ease-in-out 0.3s;
+}
+.buscador i{
+    color: #fff !important;
+    font-size: 1.5rem;
+}
+.productos-lista{
+    height: 400px !important;
+    max-height: 400px !important;
+    overflow: auto !important;
+}
 @media (max-width: 1000px) {
     .controles {
         grid-template-columns: repeat(2, 1fr) !important;

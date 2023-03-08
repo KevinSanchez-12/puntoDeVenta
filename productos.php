@@ -14,10 +14,10 @@
 <?php include_once 'components/menu.php';?>
 <section class="max-container">
     <h1>Mis productos</h1>
+    <br>
     <form>
-        <br>
         <div class="box-table" id="box-table">
-            <table class="table" id="tabla">
+            <table class="table table_id" id="tabla">
                 <thead>
                     <tr>
                         <th scope="col">Código</th>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <?php
     include_once 'components/head.php';
     include 'bd.php';
@@ -180,6 +181,50 @@
         <br>
         <button disabled onclick="registrarVenta()" id="boton" type="button" class="btn btn-success btn-opcion">Registrar venta</button>
     </form>
+    <div class="buscador" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+        <i class="fa fa-search"></i>
+    </div>
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="staticBackdropLabel"><b>Mis productos</b></h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body productos-lista">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon1">Buscar producto</span>
+                    <input type="text" class="form-control me-2 light-table-filter" placeholder="Escriba aquí" data-table="table_id">
+                </div>
+                <div class="box-table" id="box-table">
+                    <table class="table table_id" id="tabla">
+                        <thead>
+                            <tr>
+                                <th scope="col">Código</th>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Precio</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productos" class="">
+                            <?php
+                                $resultado = mysqli_query($conexion, $productos);
+                                while ($row = mysqli_fetch_array($resultado)) { ?>
+                                    <tr>
+                                        <td><?php echo $row['codigo']?></td>
+                                        <td><?php echo $row['nombre']?></td>
+                                        <td>S/<?php echo $row['precio']?></td>
+                                    </tr>
+                                <?php }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
 </section>
     <script>
         $("#buscar").click(function(){
@@ -226,5 +271,7 @@
         var codigosLista = '<?php echo $jsonb;?>';
     </script>
     <script src="assets/js/script.js?1.8"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
+    <script src="assets/js/buscador.js?1.4"></script>
 </body>
 </html>
