@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="assets/css/style.css?1.6">
     <link rel="stylesheet" href="assets/css/index.css?1.4">
     <link rel="stylesheet" href="assets/css/menu.css?1.5">
-    <link rel="stylesheet" href="assets/css/registrar-venta.css?2.1">
+    <link rel="stylesheet" href="assets/css/registrar-venta.css?2.4">
     <link rel="stylesheet" href="assets/css/historial-venta.css?1.5">
     <link rel="stylesheet" href="assets/css/reporte-venta.css?2.1">
     <link href="assets/alertifyjs/css/alertify.css" rel="stylesheet" type="text/css"/>

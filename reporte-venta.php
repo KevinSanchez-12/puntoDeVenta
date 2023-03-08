@@ -53,6 +53,9 @@
         </div>
     </form>
 </section>
-    <script src="assets/js/script.js?1.8"></script>
+    <script src="assets/js/script.js?2.1"></script>
+    <script src="https://unpkg.com/xlsx@latest/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/file-saverjs@latest/FileSaver.min.js"></script>
+    <script src="https://unpkg.com/tableexport@latest/dist/js/tableexport.min.js"></script>
 </body>
 </html>

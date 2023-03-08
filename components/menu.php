@@ -21,18 +21,12 @@
           </button>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
             <li><a class="dropdown-item" href="productos">Mis productos</a></li>
-            <li><a class="dropdown-item" href="cargar-producto">Agregar nuevos productos</a></li>
-            <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="codigos-descuento">Códigos de descuento</a></li>
-            <li><a class="dropdown-item" href="agregar-codigos-descuento">Agrear nuevos códigos de descuento</a></li>
-            <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="sedes">Sedes</a></li>
-            <li><a class="dropdown-item" href="sedes">Agregar nuevas sedes</a></li>
+            <li><a class="dropdown-item" href="cajeros">Cajeros(as)</a></li>
+            <li><a class="dropdown-item" href="mozos">Mozos(as)</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="vendedores">Vendedores</a></li>
-            <li><a class="dropdown-item" href="vendedores">Agregar nuevos vendedores</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="editar-perfil">Editar perfil</a></li>
+            <li><a class="dropdown-item" href="perfil">Editar perfil</a></li>
           </ul>
       </div>
         <li class="nav-item closeSesion">

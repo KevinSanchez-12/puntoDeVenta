@@ -68,10 +68,10 @@ tr {
     cursor: pointer;
 }
 .fa-edit{
-    background-color: yellow !important;
+    background-color: green !important;
     border-radius: 5px;
     padding: 10px;
-    color: #000;
+    color: #fff;
     cursor: pointer;
 }
 .fa-pencil{

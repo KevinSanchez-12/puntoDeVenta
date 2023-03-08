@@ -54,7 +54,7 @@
             </div>
             <div class="input-group">
                 <span class="input-group-text">N° de comprobante</span>
-                <input value="<?php echo $nComprobante?>" id="nComprobante" onkeypress="return soloNumeros(event)" type="text" class="form-control" placeholder="Escriba aquí">
+                <input disabled value="<?php echo $nComprobante?>" id="nComprobante" onkeypress="return soloNumeros(event)" type="text" class="form-control" placeholder="Escriba aquí">
             </div>
             <div class="input-group">
                 <span class="input-group-text">Fecha de emisión</span>
@@ -118,7 +118,7 @@
         <div class="detalles-comprobante">
             <div class="input-group">
                 <span class="input-group-text">Bolsas</span>
-                <input id="bolsas" type="text" class="form-control">
+                <input disabled id="bolsas" type="text" class="form-control">
                 <button onclick="aumentarBolsa()" class="btn btn-success" type="button">+</button>
                 <button onclick="disminuirBolsa()" class="btn btn-danger" type="button">-</button>
             </div>
@@ -161,7 +161,7 @@
             </div>
             <div class="input-group">
                 <span class="input-group-text">Subtotal</span>
-                <input id="subtotal" type="text" class="form-control" value="S/0.00">
+                <input disabled id="subtotal" type="text" class="form-control" value="S/0.00">
             </div>
             <div class="input-group">
                 <span class="input-group-text">Código de descuento</span>
@@ -170,11 +170,11 @@
             </div>
             <div class="input-group">
                 <span class="input-group-text">I.G.V</span>
-                <input id="igv" type="text" class="form-control" value="S/0.00">
+                <input disabled id="igv" type="text" class="form-control" value="S/0.00">
             </div>
             <div class="input-group">
                 <span class="input-group-text">Total a pagar</span>
-                <input id="total" type="text" class="form-control" value="S/0.00">
+                <input disabled id="total" type="text" class="form-control" value="S/0.00">
             </div>
         </div>
         <br>
@@ -225,6 +225,6 @@
         var productosLista = '<?php echo $json;?>';
         var codigosLista = '<?php echo $jsonb;?>';
     </script>
-    <script src="assets/js/script.js?1.2"></script>
+    <script src="assets/js/script.js?1.8"></script>
 </body>
 </html>

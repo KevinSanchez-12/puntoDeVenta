@@ -70,7 +70,7 @@ function agregarProducto(){
     )
     for(i=0; i<productos.length; i++){
         if(productos[i].id == productos.length){
-            document.getElementById('productos').insertRow(-1).innerHTML = '<td>'+productos[i].id+'</td><td><div style="max-width:350px !important; margin:auto" class="input-group"><span class="input-group-text">Código</span><input value="'+productos[i].codigo+'" id="codigoProducto'+productos[i].id+'" style="max-width:200px !important" type="text" class="form-control" placeholder="Escriba aquí"><button onclick="buscarProducto('+productos[i].id+')" style="align-items:center" class="btn btn btn-success" type="button" id="buscar'+productos[i].id+'">Buscar</button></div></td><td><span id="nombreProducto'+productos[i].id+'"></span></td><td><span id="precioProducto'+productos[i].id+'"></span></td><td><div class="input-group"><input id="numero'+productos[i].id+'" type="text" class="form-control" value="1"><button onclick="aumentarCantidad('+productos[i].id+')" style="align-items:center" class="btn btn btn-success" type="button">+</button><button onclick="disminuirCantidad('+productos[i].id+')" style="align-items:center" class="btn btn btn-danger" type="button">-</button></div></td><td><span id="totalProducto'+productos[i].id+'"></span></td><td><i onclick="eliminarProductov(this, '+productos[i].id+')" class="fa fa-close"></i></td>';
+            document.getElementById('productos').insertRow(-1).innerHTML = '<td>'+productos[i].id+'</td><td><div style="max-width:350px !important; margin:auto" class="input-group"><span class="input-group-text">Código</span><input value="'+productos[i].codigo+'" id="codigoProducto'+productos[i].id+'" style="max-width:200px !important" type="text" class="form-control" placeholder="Escriba aquí"><button onclick="buscarProducto('+productos[i].id+')" style="align-items:center" class="btn btn btn-success" type="button" id="buscar'+productos[i].id+'">Buscar</button></div></td><td><span id="nombreProducto'+productos[i].id+'"></span></td><td><span id="precioProducto'+productos[i].id+'"></span></td><td><div style="max-width:200px !important; margin:auto" class="input-group"><input disabled id="numero'+productos[i].id+'" type="text" class="form-control" value="1"><button onclick="aumentarCantidad('+productos[i].id+')" style="align-items:center" class="btn btn btn-success" type="button">+</button><button onclick="disminuirCantidad('+productos[i].id+')" style="align-items:center" class="btn btn btn-danger" type="button">-</button></div></td><td><span id="totalProducto'+productos[i].id+'"></span></td><td><i onclick="eliminarProductov(this, '+productos[i].id+')" class="fa fa-close"></i></td>';
             validarCampos();
         }
     }
@@ -91,6 +91,7 @@ function buscarProducto(i) {
                         document.getElementById('precioProducto'+i).innerHTML = "S/"+(parseFloat(precioX)).toFixed(2);
                         document.getElementById('totalProducto'+i).innerHTML = "S/"+(parseFloat(precioX)).toFixed(2);
                         document.getElementById('buscar'+i).disabled = true;
+                        document.getElementById('codigoProducto'+i).disabled = true;
                     }
                 }
                 producto.codigo = codigoX;
@@ -443,24 +444,21 @@ function obtenerReporte(){
         }
 }
 function exportarExcel(){
-    var downloadLink;
-    var dataType = 'application/vnd.ms-excel';
-    var tableSelect = document.getElementById('tabla');
-    var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
-    var filename = 'Reporte' + new Date().toLocaleDateString() + '.xls';
-    downloadLink = document.createElement("a");
-    document.body.appendChild(downloadLink);
-    if (navigator.msSaveOrOpenBlob) {
-        var blob = new Blob(['\ufeff', tableHTML], {
-            type: dataType,
-            content: 'charset=utf-8'
-        });
-        navigator.msSaveOrOpenBlob(blob, filename);
-    }else{
-        downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
-        downloadLink.download = filename;
-        downloadLink.click();
-    }
+    var tabla = document.getElementById("tabla");
+    var fecha = new Date();
+    var dia = fecha.getDate() < 10 ? '0' + fecha.getDate() : fecha.getDate();
+    var mes = fecha.getMonth() < 10 ? '0' + fecha.getMonth() : fecha.getMonth();
+    var anio = fecha.getFullYear();
+    var filename = 'Reporte'+ ' ' + dia + '-' + mes + '-' + anio + '.xls';
+    var html = tabla.outerHTML;
+    var blob = new Blob(['\ufeff', html], {
+        type: 'application/vnd.ms-excel',
+    })
+
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
 }
 function aumentarBolsa(){
     var cantidad = document.getElementById('bolsas').value;
@@ -474,7 +472,7 @@ function aumentarBolsa(){
 }
 function disminuirBolsa(){
     var cantidad = document.getElementById('bolsas').value;
-    if(cantidad > 1){
+    if(cantidad > 0){
         cantidad--;
         var total = document.getElementById('total').value;
         total = total.replace("S/", "");
@@ -484,77 +482,441 @@ function disminuirBolsa(){
         document.getElementById('bolsas').value = cantidad;
     }
 }
-var nuevosProductos = [];
-function agregarNuevoProducto(){
-    document.getElementById('guardarProductos').disabled = false;
-    if(nuevosProductos.length > 0){
-        for(i=0; i<nuevosProductos.length; i++){
-            if(nuevosProductos[i].codigo == "" || nuevosProductos[i].nombre == "" || nuevosProductos[i].precio == 0){
-                alertify.error("Complete los campos y valide para agregar un nuevo producto");
-                return;
-            }
-        }
-    }
-    nuevosProductos.push({
-        id: nuevosProductos.length+1,
-        codigo: "",
-        nombre: "",
-        precio: 0,
-    })
-    for(i=0; i<nuevosProductos.length; i++){
-        if(nuevosProductos[i].id == nuevosProductos.length){
-            document.getElementById('productos').insertRow(-1).innerHTML = '<tr><td>'+nuevosProductos[i].id+'</td><td><div style="max-width:250px !important; margin:auto" class="input-group"><input value="'+nuevosProductos[i].codigo+'" id="codigoProducto'+nuevosProductos[i].id+'" type="text" class="form-control" placeholder="Escriba aquí"></div></td><td><input value="'+nuevosProductos[i].nombre+'" id="nombreProducto'+nuevosProductos[i].id+'" type="text" class="form-control" placeholder="Escriba aquí"></td><td><div class="input-group"><span class="input-group-text">S/</span><input value="'+nuevosProductos[i].precio+'" id="precioProducto'+nuevosProductos[i].id+'" type="text" class="form-control" placeholder="Escriba aquí"></div></td><td><i onclick="validarNuevoProducto('+nuevosProductos[i].id+')" class="fa fa-check"></i></td><td><i onclick="eliminarNuevoProducto(this, '+nuevosProductos[i].id+')" class="fa fa-close"></i></td></tr>'
-        }
-    }
-}
-function validarNuevoProducto(i){
-    nuevosProductos.forEach((producto) => {
-        if(producto.id == i){
-            if(document.getElementById('codigoProducto'+i).value == "" || document.getElementById('nombreProducto'+i).value == "" || document.getElementById('precioProducto'+i).value == 0){
-                alertify.error("Complete todos los campos");
-                return;
-            }else{
-                producto.codigo = document.getElementById('codigoProducto'+i).value;
-                producto.nombre = document.getElementById('nombreProducto'+i).value;
-                producto.precio = document.getElementById('precioProducto'+i).value;
-                document.getElementById('codigoProducto'+i).disabled = true;
-                document.getElementById('nombreProducto'+i).disabled = true;
-                document.getElementById('precioProducto'+i).disabled = true;
-            }
-        }
-    })
-}
-function eliminarNuevoProducto(el, i){
-    nuevosProductos.forEach((producto) => {
-        if(producto.id == i){
-            var index = nuevosProductos.indexOf(producto);
-            nuevosProductos.splice(index, 1);
-            var tr = upto(el, 'tr');
-            if(tr){
-                var tbody = tr.parentNode;
-                tbody.removeChild(tr);
-            }
-        }
-    })
-    if(nuevosProductos.length > 0){
-        document.getElementById('guardarProductos').disabled = false;
-    }else{
-        document.getElementById('guardarProductos').disabled = true;
-    }
-}
-function registrarNuevosProductos(){
+function abrirModalEditarProducto(i){
     $.ajax({
         type: "POST",
-        url: "registrarNuevosProductos.php",
+        url: "detalle-producto.php",
         dataType: 'json',
         data: {
-            nuevosProductos: nuevosProductos
-        }, error: function (){
-            nuevosProductos = [];
-            document.getElementById('productos').innerHTML = "";
-            document.getElementById('guardarProductos').disabled = true;
-            alertify.success("Productos registrados")
+            id: i
         }
-    })
+    }).done(
+        function (data) {
+            document.getElementById('codigoProducto').value = data.codigo;
+            document.getElementById('nombreProducto').value = data.nombre;
+            document.getElementById('precioProducto').value = "S/"+parseFloat(data.precio).toFixed(2);
+            document.getElementById('btn-actualizar').onclick = function(){actualizarProducto(data.id)};
+        }
+    )
 }
-var nuevosCodigos = [];
+function abrirModalEliminarProducto(i){
+    $.ajax({
+        type: "POST",
+        url: "detalle-producto.php",
+        dataType: 'json',
+        data: {
+            id: i
+        }
+    }).done(
+        function (data) {
+            document.getElementById('nombreProductoModalEliminar').innerHTML = data.nombre;
+            document.getElementById('btn-eliminar').onclick = function(){eliminarProducto(data.id)};
+        }
+    )
+}
+function eliminarProducto(i){
+    $.ajax({
+        type: "POST",
+        url: "eliminar-producto.php",
+        dataType: 'json',
+        data: {
+            id: i
+        }
+    }).done(
+        function (data) {
+            document.getElementById('btn-eliminar').disabled = true;
+            alertify.success(data.message);
+            setTimeout(function(){location.reload()}, 1000);
+        }
+    )
+}
+function actualizarProducto(i){
+    $.ajax({
+        type: "POST",
+        url: "actualizar-producto.php",
+        dataType: 'json',
+        data: {
+            id: i,
+            codigo: document.getElementById('codigoProducto').value,
+            nombre: document.getElementById('nombreProducto').value,
+            precio: document.getElementById('precioProducto').value.replace("S/", "")
+        }
+    }).done(
+        function (data) {
+            document.getElementById('btn-actualizar').disabled = true;
+            alertify.success(data.message);
+            setTimeout(function(){location.reload()}, 1000);
+        }
+    )
+}
+function agregarProductoModal(){
+    $.ajax({
+        type: "POST",
+        url: "cargar-producto.php",
+        dataType: 'json',
+        data: {
+            codigo: document.getElementById('codigoProductoAgregar').value,
+            nombre: document.getElementById('nombreProductoAgregar').value,
+            precio: document.getElementById('precioProductoAgregar').value.replace("S/", "")
+        }
+    }).done(
+        function (data) {
+            document.getElementById('btn-agregar').disabled = true;
+            alertify.success(data.message);
+            setTimeout(function(){location.reload()}, 1000);
+        }
+    )
+}
+function abrirModalEditarCodigo(i){
+    $.ajax({
+        type: "POST",
+        url: "detalle-codigo.php",
+        dataType: 'json',
+        data: {
+            id: i
+        }
+    }).done(
+        function (data) {
+            document.getElementById('codigoCodigo').value = data.codigo;
+            document.getElementById('descuentoCodigo').value = data.descuento;
+            document.getElementById('btn-actualizar').onclick = function(){actualizarCodigo(data.id)};
+        }
+    )
+}
+function actualizarCodigo(i) {
+    $.ajax({
+        type: "POST",
+        url: "actualizar-codigo.php",
+        dataType: 'json',
+        data: {
+            id: i,
+            codigo: document.getElementById('codigoCodigo').value,
+            descuento: document.getElementById('descuentoCodigo').value
+        }
+    }).done(
+        function (data) {
+            document.getElementById('btn-actualizar').disabled = true;
+            alertify.success(data.message);
+            setTimeout(function(){location.reload()}, 1000);
+        }
+    )
+}
+function abrirModalEliminarCodigo(i){
+    $.ajax({
+        type: "POST",
+        url: "detalle-codigo.php",
+        dataType: 'json',
+        data: {
+            id: i
+        }
+    }).done(
+        function (data) {
+            document.getElementById('nombreCodigoModalEliminar').innerHTML = data.codigo;
+            document.getElementById('btn-eliminarCodigo').onclick = function(){eliminarCodigo(data.id)};
+        }
+    )
+}
+function eliminarCodigo(i){
+    $.ajax({
+        type: "POST",
+        url: "eliminar-codigo.php",
+        dataType: 'json',
+        data: {
+            id: i
+        }
+    }).done(
+        function (data) {
+            document.getElementById('btn-eliminarCodigo').disabled = true;
+            alertify.success(data.message);
+            setTimeout(function(){location.reload()}, 1000);
+        }
+    )
+}
+function agregarCodigoModal(){
+    $.ajax({
+        type: "POST",
+        url: "cargar-codigo.php",
+        dataType: 'json',
+        data: {
+            codigo: document.getElementById('codigoCodigoAgregar').value,
+            descuento: document.getElementById('descuentoCodigoAgregar').value
+        }
+    }).done(
+        function (data) {
+            document.getElementById('btn-agregar-codigo').disabled = true;
+            alertify.success(data.message);
+            setTimeout(function(){location.reload()}, 1000);
+        }
+    )
+}
+function abrirModalEditarSede(i){
+    $.ajax({
+        type: "POST",
+        url: "detalle-sede.php",
+        dataType: 'json',
+        data: {
+            id: i
+        }
+    }).done(
+        function (data) {
+            document.getElementById('nombreSede').value = data.nombre;
+            document.getElementById('btn-actualizar').onclick = function(){actualizarSede(data.id)};
+        }
+    )
+}
+function actualizarSede(i){
+    $.ajax({
+        type: "POST",
+        url: "actualizar-sede.php",
+        dataType: 'json',
+        data: {
+            id: i,
+            nombre: document.getElementById('nombreSede').value
+        }
+    }).done(
+        function (data) {
+            document.getElementById('btn-actualizar').disabled = true;
+            alertify.success(data.message);
+            setTimeout(function(){location.reload()}, 1000);
+        }
+    )
+}
+function abrirModalEliminarSede(i){
+    $.ajax({
+        type: "POST",
+        url: "detalle-sede.php",
+        dataType: 'json',
+        data: {
+            id: i
+        }
+    }).done(
+        function (data) {
+            document.getElementById('nombreSedeModalEliminar').innerHTML = data.nombre;
+            document.getElementById('btn-eliminar').onclick = function(){eliminarSede(data.id)};
+        }
+    )
+}
+function eliminarSede(i){
+    $.ajax({
+        type: "POST",
+        url: "eliminar-sede.php",
+        dataType: 'json',
+        data: {
+            id: i
+        }
+    }).done(
+        function (data) {
+            document.getElementById('btn-eliminar').disabled = true;
+            alertify.success(data.message);
+            setTimeout(function(){location.reload()}, 1000);
+        }
+    )
+}
+function agregarSedeModal(){
+    $.ajax({
+        type: "POST",
+        url: "cargar-sede.php",
+        dataType: 'json',
+        data: {
+            nombre: document.getElementById('nombreSedeAgregar').value
+        }
+    }).done(
+        function (data) {
+            document.getElementById('btn-agregar-sede').disabled = true;
+            alertify.success(data.message);
+            setTimeout(function(){location.reload()}, 1000);
+        }
+    )
+}
+function abrirModalEditarCajero(i){
+    $.ajax({
+        type: "POST",
+        url: "detalle-cajero.php",
+        dataType: 'json',
+        data: {
+            id: i
+        }
+    }).done(
+        function (data) {
+            document.getElementById('nombreCajero').value = data.nombre;
+            document.getElementById('btn-actualizar').onclick = function(){actualizarCajero(data.id)};
+        }
+    )
+}
+function actualizarCajero(i){
+    $.ajax({
+        type: "POST",
+        url: "actualizar-cajero.php",
+        dataType: 'json',
+        data: {
+            id: i,
+            nombre: document.getElementById('nombreCajero').value
+        }
+    }).done(
+        function (data) {
+            document.getElementById('btn-actualizar').disabled = true;
+            alertify.success(data.message);
+            setTimeout(function(){location.reload()}, 1000);
+        }
+    )
+}
+function abrirModalEliminarCajero(i){
+    $.ajax({
+        type: "POST",
+        url: "detalle-cajero.php",
+        dataType: 'json',
+        data: {
+            id: i
+        }
+    }).done(
+        function (data) {
+            document.getElementById('nombreCajeroModalEliminar').innerHTML = data.nombre;
+            document.getElementById('btn-eliminar').onclick = function(){eliminarCajero(data.id)};
+        }
+    )
+}
+function eliminarCajero(i){
+    $.ajax({
+        type: "POST",
+        url: "eliminar-cajero.php",
+        dataType: 'json',
+        data: {
+            id: i
+        }
+    }).done(
+        function (data) {
+            document.getElementById('btn-eliminar').disabled = true;
+            alertify.success(data.message);
+            setTimeout(function(){location.reload()}, 1000);
+        }
+    )
+}
+function agregarCajeroModal(){
+    $.ajax({
+        type: "POST",
+        url: "cargar-cajero.php",
+        dataType: 'json',
+        data: {
+            nombre: document.getElementById('nombreCajeroAgregar').value
+        }
+    }).done(
+        function (data) {
+            document.getElementById('btn-agregar-cajero').disabled = true;
+            alertify.success(data.message);
+            setTimeout(function(){location.reload()}, 1000);
+        }
+    )
+}
+function abrirModalEditarMozo(i){
+    $.ajax({
+        type: "POST",
+        url: "detalle-mozo.php",
+        dataType: 'json',
+        data: {
+            id: i
+        }
+    }).done(
+        function (data) {
+            document.getElementById('nombreMozo').value = data.nombre;
+            document.getElementById('btn-actualizar').onclick = function(){actualizarMozo(data.id)};
+        }
+    )
+}
+function actualizarMozo(i){
+    $.ajax({
+        type: "POST",
+        url: "actualizar-mozo.php",
+        dataType: 'json',
+        data: {
+            id: i,
+            nombre: document.getElementById('nombreMozo').value
+        }
+    }).done(
+        function (data) {
+            document.getElementById('btn-actualizar').disabled = true;
+            alertify.success(data.message);
+            setTimeout(function(){location.reload()}, 1000);
+        }
+    )
+}
+function abrirModalEliminarMozo(i){
+    $.ajax({
+        type: "POST",
+        url: "detalle-mozo.php",
+        dataType: 'json',
+        data: {
+            id: i
+        }
+    }).done(
+        function (data) {
+            document.getElementById('nombreMozoModalEliminar').innerHTML = data.nombre;
+            document.getElementById('btn-eliminar').onclick = function(){eliminarMozo(data.id)};
+        }
+    )
+}
+function eliminarMozo(i){
+    $.ajax({
+        type: "POST",
+        url: "eliminar-mozo.php",
+        dataType: 'json',
+        data: {
+            id: i
+        }
+    }).done(
+        function (data) {
+            document.getElementById('btn-eliminar').disabled = true;
+            alertify.success(data.message);
+            setTimeout(function(){location.reload()}, 1000);
+        }
+    )
+}
+function agregarMozoModal(){
+    $.ajax({
+        type: "POST",
+        url: "cargar-mozo.php",
+        dataType: 'json',
+        data: {
+            nombre: document.getElementById('nombreMozoAgregar').value
+        }
+    }).done(
+        function (data) {
+            document.getElementById('btn-agregar-mozo').disabled = true;
+            alertify.success(data.message);
+            setTimeout(function(){location.reload()}, 1000);
+        }
+    )
+}
+function abrirModalEditarPerfil(i){
+    $.ajax({
+        type: "POST",
+        url: "detalle-perfil.php",
+        dataType: 'json',
+        data: {
+            id: i
+        }
+    }).done(
+        function (data) {
+            document.getElementById('correoPerfil').value = data.correo;
+            document.getElementById('passwordPerfil').value = data.password;
+            document.getElementById('btn-actualizar').onclick = function(){actualizarPerfil(data.id)};
+        }
+    )
+}
+function actualizarPerfil(i) {
+    $.ajax({
+        type: "POST",
+        url: "actualizar-perfil.php",
+        dataType: 'json',
+        data: {
+            id: i,
+            correo: document.getElementById('correoPerfil').value,
+            password: document.getElementById('passwordPerfil').value
+        }
+    }).done(
+        function (data) {
+            document.getElementById('btn-actualizar').disabled = true;
+            alertify.success(data.message);
+            setTimeout(function(){location.reload()}, 1000);
+        }
+    )
+}
