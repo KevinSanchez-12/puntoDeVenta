@@ -203,6 +203,7 @@
                                 <th scope="col">Código</th>
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Precio</th>
+                                <th scope="col">Copiar código</th>
                             </tr>
                         </thead>
                         <tbody id="productos" class="">
@@ -213,6 +214,7 @@
                                         <td><?php echo $row['codigo']?></td>
                                         <td><?php echo $row['nombre']?></td>
                                         <td>S/<?php echo $row['precio']?></td>
+                                        <td><i onclick="copiarCodigo('<?php echo $row['codigo']?>')" class='bx bx-copy-alt'></i></td>
                                     </tr>
                                 <?php }
                             ?>
@@ -270,7 +272,7 @@
         var productosLista = '<?php echo $json;?>';
         var codigosLista = '<?php echo $jsonb;?>';
     </script>
-    <script src="assets/js/script.js?1.8"></script>
+    <script src="assets/js/script.js?2.1"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
     <script src="assets/js/buscador.js?1.4"></script>
 </body>

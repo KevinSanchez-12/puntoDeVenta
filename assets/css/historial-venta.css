@@ -34,3 +34,15 @@
     width: 35px !important;
     cursor: pointer;
 }
+.bx-envelope {
+    background-color: rgb(251, 255, 0) !important;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #000;
+    margin: auto;
+    padding: 10px;
+    width: 35px !important;
+    cursor: pointer;
+}

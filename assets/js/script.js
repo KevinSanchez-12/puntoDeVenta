@@ -920,3 +920,7 @@ function actualizarPerfil(i) {
         }
     )
 }
+function copiarCodigo(codigo){
+    navigator.clipboard.writeText(codigo);
+    alertify.success('Código copiado');
+}

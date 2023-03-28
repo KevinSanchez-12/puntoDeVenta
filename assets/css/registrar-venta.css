@@ -108,6 +108,18 @@ tr {
     max-height: 400px !important;
     overflow: auto !important;
 }
+.bx-copy-alt{
+    background-color: green !important;
+    border-radius: 5px;
+    color: #fff !important;
+    cursor: pointer !important;
+    height: 32px !important;
+    width: 32px !important;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 @media (max-width: 1000px) {
     .controles {
         grid-template-columns: repeat(2, 1fr) !important;
